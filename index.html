@@ -670,12 +670,14 @@
                         renderSavedList();
                         alert('Backup ripristinato con successo!');
                     } else {
-                        alert('Formato file non valido.');
+                        alert('Formato file non valido: deve essere una lista di ricevute.');
                     }
                 } catch (err) {
-                    alert('Errore nella lettura del file JSON.');
+                    alert('Errore nella lettura del file JSON: ' + err.message);
                     console.error(err);
                 }
+                // Reset input to allow re-selection of the same file
+                input.value = '';
             };
             reader.readAsText(file);
         };
