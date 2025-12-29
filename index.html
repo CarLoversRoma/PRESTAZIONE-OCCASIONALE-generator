@@ -1,47 +1,318 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generatore Ricevuta Prestazione Occasionale</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-section, .preview-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h2 { margin-bottom: 15px; color: #333; font-size: 18px; border-bottom: 2px solid #4f46e5; padding-bottom: 8px; }
-        .field { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; color: #555; }
-        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
-        textarea { resize: vertical; min-height: 80px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        button { background: #4f46e5; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-top: 10px; }
-        button:hover { background: #4338ca; }
-        .preview { border: 1px solid #ddd; padding: 30px; background: white; }
-        .header { display: flex; justify-content: space-between; padding-bottom: 20px; border-bottom: 2px solid #e5e5e5; margin-bottom: 20px; }
-        .logo { max-height: 60px; max-width: 150px; }
-        .recipient { margin: 20px 0; }
-        .totals { margin-top: 30px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e5e5e5; }
-        th { background: #f9f9f9; font-weight: 600; }
-        .total-row { font-weight: bold; font-size: 16px; }
-        .notes { margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e5e5; font-size: 11px; color: #666; }
-        @media print {
-            body { background: white; padding: 0; }
-            .container { grid-template-columns: 1fr; }
-            .form-section, button { display: none; }
-            .preview-section { box-shadow: none; padding: 0; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
+
+        html,
+        body {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px minmax(400px, 1fr) 1fr;
+            gap: 15px;
+            height: 100%;
+        }
+
+        .sidebar-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .form-section,
+        .preview-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+            border-bottom: 2px solid #4f46e5;
+            padding-bottom: 8px;
+        }
+
+        .field {
+            margin-bottom: 15px;
+        }
+
+        /* New Styles for Sidebar */
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .actions button {
+            width: 100%;
+            text-align: left;
+            margin: 0;
+        }
+
+        .saved-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .saved-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .saved-item:hover {
+            background: #f9fafb;
+        }
+
+        .saved-item div {
+            flex-grow: 1;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            padding: 2px 8px;
+            font-size: 16px;
+            margin: 0 0 0 10px;
+            width: auto;
+            border-radius: 4px;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .duplicate-btn {
+            background: #3b82f6;
+            padding: 2px 8px;
+            font-size: 16px;
+            margin: 0 0 0 10px;
+            width: auto;
+            border-radius: 4px;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .duplicate-btn:hover {
+            background: #2563eb;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #555;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #4338ca;
+        }
+
+        .preview {
+            border: 1px solid #ddd;
+            padding: 30px;
+            background: white;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e5e5e5;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            max-height: 60px;
+            max-width: 150px;
+        }
+
+        .recipient {
+            margin: 20px 0;
+        }
+
+        .totals {
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        th {
+            background: #f9f9f9;
+            font-weight: 600;
+        }
+
+        .total-row {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .notes {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e5e5;
+            font-size: 11px;
+            color: #666;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                height: auto;
+                overflow: visible;
+            }
+
+            .container {
+                display: block;
+                height: auto;
+            }
+
+            .sidebar-section,
+            .form-section {
+                display: none;
+            }
+
+            .preview-section {
+                box-shadow: none;
+                padding: 0;
+                border: none;
+                height: auto;
+                overflow: visible;
+            }
+
+            .preview {
+                border: none;
+                padding: 0;
+            }
+        }
+
         @media (max-width: 768px) {
-            .container { grid-template-columns: 1fr; }
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                height: auto;
+            }
+
+            html,
+            body {
+                height: auto;
+                overflow: auto;
+            }
+
+            .sidebar-section,
+            .form-section,
+            .preview-section {
+                height: auto;
+                overflow: visible;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
+        <!-- Sidebar Section -->
+        <div class="sidebar-section">
+            <h2>Archivio</h2>
+            <div class="actions">
+                <button onclick="createNew()" style="background: #10b981;">+ Nuova</button>
+                <button onclick="downloadJSON()" style="background: #6366f1;">↓ Backup JSON</button>
+                <button onclick="triggerImport()" style="background: #8b5cf6;">↑ Ripristina</button>
+                <input type="file" id="importFile" hidden accept=".json" onchange="importJSON(this)">
+            </div>
+            <div id="savedList" class="saved-list">
+                <!-- Lista popolata via JS -->
+            </div>
+        </div>
+
         <div class="form-section">
-            <h2>I Tuoi Dati</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin:0; border:none;">I Tuoi Dati</h2>
+                <button onclick="saveToArchive()" style="background: #f59e0b; margin:0;">Salva in Archivio</button>
+            </div>
+
             <div class="field">
                 <label>Nome e Cognome / Ragione Sociale</label>
                 <input type="text" id="senderName" placeholder="Mario Rossi">
@@ -88,9 +359,17 @@
                 <label>Descrizione Prestazione</label>
                 <textarea id="invoiceDescription" placeholder="Consulenza informatica..."></textarea>
             </div>
-            <div class="field">
-                <label>Importo Lordo (€)</label>
-                <input type="number" id="grossAmount" value="0" step="0.01">
+            <div class="grid">
+                <div class="field">
+                    <label>Importo Netto a Pagare (€)</label>
+                    <input type="number" id="netAmount" value="0" step="0.01"
+                        style="border-color: #4f46e5; background: #eef2ff; font-weight: bold;">
+                </div>
+                <div class="field">
+                    <label>Importo Lordo (€)</label>
+                    <input type="number" id="grossAmount" value="0" step="0.01" readonly
+                        style="background: #f3f4f6; color: #666;">
+                </div>
             </div>
             <div class="field">
                 <label>Modalità di pagamento</label>
@@ -147,10 +426,15 @@
                 </div>
 
                 <div class="notes">
-                    <p style="margin-bottom: 8px;">Operazione non soggetta ad IVA ai sensi dell'art. 5, comma 2, DPR 633/1972.</p>
-                    <p style="margin-bottom: 15px;">Il/La sottoscritto/a dichiara di non aver superato, alla data odierna, la soglia annua di € 5.000 di compensi da prestazioni occasionali (art. 44, DL 269/2003) e che pertanto non sono dovuti contributi previdenziali alla Gestione Separata INPS.</p>
+                    <p style="margin-bottom: 8px;">Operazione non soggetta ad IVA ai sensi dell'art. 5, comma 2, DPR
+                        633/1972.</p>
+                    <p style="margin-bottom: 15px;">Il/La sottoscritto/a dichiara di non aver superato, alla data
+                        odierna, la soglia annua di € 5.000 di compensi da prestazioni occasionali (art. 44, DL
+                        269/2003) e che pertanto non sono dovuti contributi previdenziali alla Gestione Separata INPS.
+                    </p>
                     <p id="stampNote" style="font-weight: bold; margin-bottom: 15px;"></p>
-                    <p style="margin-bottom: 5px;">Modalità di pagamento: _______________________________</p>
+                    <p style="margin-bottom: 5px;">Modalità di pagamento: <span id="previewPaymentMethod"
+                            style="font-weight: bold;"></span></p>
                     <div style="display: flex; justify-content: space-between; margin-top: 30px;">
                         <div>
                             <p>Luogo e data</p>
@@ -168,39 +452,262 @@
 
     <script>
         const today = new Date().toISOString().split('T')[0];
-        document.getElementById('invoiceDate').value = today;
+
+        // State
+        let currentId = null;
+        let performances = JSON.parse(localStorage.getItem('performances')) || [];
+
+        // Init
+        function init() {
+            // Load draft if exists
+            const draft = JSON.parse(localStorage.getItem('currentDraft'));
+            if (draft) {
+                loadFormData(draft);
+            } else {
+                document.getElementById('invoiceDate').value = today;
+            }
+            renderSavedList();
+            updatePreview();
+        }
+
+        // --- Core Functions ---
 
         function formatCurrency(amount) {
             return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(amount);
         }
 
         function formatDate(dateString) {
+            if (!dateString) return '-';
             const date = new Date(dateString);
             return date.toLocaleDateString('it-IT');
         }
+
+        function getFormData() {
+            return {
+                id: currentId || Date.now(),
+                senderName: document.getElementById('senderName').value,
+                senderAddress: document.getElementById('senderAddress').value,
+                senderTax: document.getElementById('senderTax').value,
+                recipientName: document.getElementById('recipientName').value,
+                recipientAddress: document.getElementById('recipientAddress').value,
+                recipientTax: document.getElementById('recipientTax').value,
+                invoiceNumber: document.getElementById('invoiceNumber').value,
+                invoiceDate: document.getElementById('invoiceDate').value,
+                invoiceDescription: document.getElementById('invoiceDescription').value,
+                grossAmount: document.getElementById('grossAmount').value,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                // Logo is not saved in JSON to avoid huge files, only LocalStorage could handle it but with limits.
+                // For simplicity we rely on re-uploading or browser cache for now, or we could save base64 if small.
+            };
+        }
+
+        function loadFormData(data) {
+            currentId = data.id;
+            document.getElementById('senderName').value = data.senderName || '';
+            document.getElementById('senderAddress').value = data.senderAddress || '';
+            document.getElementById('senderTax').value = data.senderTax || '';
+            document.getElementById('recipientName').value = data.recipientName || '';
+            document.getElementById('recipientAddress').value = data.recipientAddress || '';
+            document.getElementById('recipientTax').value = data.recipientTax || '';
+            document.getElementById('invoiceNumber').value = data.invoiceNumber || '1';
+            document.getElementById('invoiceDate').value = data.invoiceDate || today;
+            document.getElementById('invoiceDescription').value = data.invoiceDescription || '';
+
+            // Set Gross and Calculate Net
+            const gross = data.grossAmount || '0';
+            document.getElementById('grossAmount').value = gross;
+            document.getElementById('netAmount').value = (parseFloat(gross) * 0.8).toFixed(2);
+
+            document.getElementById('paymentMethod').value = data.paymentMethod || '';
+            updatePreview();
+        }
+
+        function calculateAmounts(source) {
+            const grossInput = document.getElementById('grossAmount');
+            const netInput = document.getElementById('netAmount');
+
+            if (source === 'net') {
+                const net = parseFloat(netInput.value) || 0;
+                // Formula: Gross = Net / 0.8  (assuming 20% withholding)
+                const gross = net / 0.8;
+                grossInput.value = gross.toFixed(2);
+            }
+            // We removed direct edit of gross for simplicity based on user request ("I enter net"), 
+            // but if we wanted bidirectional we would add 'else if (source === 'gross')' logic.
+            // For now Gross is readonly to avoid confusion, driven by Net.
+
+            updatePreview();
+            autoSave();
+        }
+
+        function autoSave() {
+            const data = getFormData();
+            localStorage.setItem('currentDraft', JSON.stringify(data));
+        }
+
+        function saveToArchive() {
+            const data = getFormData();
+
+            // Check if already exists
+            const existingIndex = performances.findIndex(p => p.id === data.id);
+            if (existingIndex >= 0) {
+                performances[existingIndex] = data;
+            } else {
+                performances.push(data);
+            }
+
+            // Sort by date desc
+            performances.sort((a, b) => new Date(b.invoiceDate) - new Date(a.invoiceDate));
+
+            localStorage.setItem('performances', JSON.stringify(performances));
+            renderSavedList();
+            alert('Prestazione salvata in archivio!');
+        }
+
+        function createNew() {
+            if (confirm('Vuoi davvero creare una nuova prestazione? Le modifiche non salvate verranno perse.')) {
+                currentId = null;
+                localStorage.removeItem('currentDraft');
+                document.querySelectorAll('input, textarea').forEach(el => {
+                    if (el.type !== 'file') el.value = '';
+                });
+                document.getElementById('invoiceDate').value = today;
+                document.getElementById('invoiceNumber').value = '1';
+                document.getElementById('grossAmount').value = '0';
+                document.getElementById('netAmount').value = '0';
+                updatePreview();
+            }
+        }
+
+        function duplicatePerformance(id, event) {
+            // Stop propagation to prevent opening the old one as "edit"
+            if (event) event.stopPropagation();
+
+            const data = performances.find(p => p.id === id);
+            if (data) {
+                // Load data
+                loadFormData(data);
+                // Reset ID to create new
+                currentId = null;
+                // Set date to today
+                document.getElementById('invoiceDate').value = today;
+                document.getElementById('invoiceNumber').value = ''; // Optional: clear number to force check
+
+                updatePreview();
+                autoSave(); // Save as current draft
+                alert('Dati duplicati! Ora puoi modificarli e salvare come nuova ricevuta.');
+            }
+        }
+
+        function deletePerformance(id, event) {
+            if (event) event.stopPropagation();
+            if (confirm('Eliminare questa ricevuta?')) {
+                performances = performances.filter(p => p.id !== id);
+                localStorage.setItem('performances', JSON.stringify(performances));
+                renderSavedList();
+                if (currentId === id) createNew();
+            }
+        }
+
+        function renderSavedList() {
+            const list = document.getElementById('savedList');
+            list.innerHTML = '';
+
+            performances.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'saved-item';
+                item.innerHTML = `
+                    <div onclick="loadPerformance(${p.id})">
+                        <strong>Ricevuta #${p.invoiceNumber}</strong><br>
+                        <small>${formatDate(p.invoiceDate)} - ${p.recipientName || 'No Nome'}</small>
+                    </div>
+                    <button class="duplicate-btn" onclick="duplicatePerformance(${p.id}, event)" title="Duplica / Crea simile">📋</button>
+                    <button class="delete-btn" onclick="deletePerformance(${p.id}, event)" title="Elimina">×</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        window.loadPerformance = function (id) {
+            const data = performances.find(p => p.id === id);
+            if (data) {
+                loadFormData(data);
+                // Also update draft so we don't lose it if we reload
+                localStorage.setItem('currentDraft', JSON.stringify(data));
+            }
+        };
+
+        // --- Export / Import ---
+
+        function downloadJSON() {
+            const dataStr = JSON.stringify(performances, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_prestazioni_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function triggerImport() {
+            document.getElementById('importFile').click();
+        }
+
+        window.importJSON = function (input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        performances = imported;
+                        localStorage.setItem('performances', JSON.stringify(performances));
+                        renderSavedList();
+                        alert('Backup ripristinato con successo!');
+                    } else {
+                        alert('Formato file non valido.');
+                    }
+                } catch (err) {
+                    alert('Errore nella lettura del file JSON.');
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        // --- Preview Logic ---
 
         function updatePreview() {
             document.getElementById('previewSenderName').textContent = document.getElementById('senderName').value || 'Nome Mittente';
             document.getElementById('previewSenderAddress').textContent = document.getElementById('senderAddress').value || 'Indirizzo Mittente';
             document.getElementById('previewSenderTax').textContent = document.getElementById('senderTax').value || '-';
-            
+
             document.getElementById('previewRecipientName').textContent = document.getElementById('recipientName').value || 'Nome Cliente';
             document.getElementById('previewRecipientAddress').textContent = document.getElementById('recipientAddress').value || 'Indirizzo Cliente';
             document.getElementById('previewRecipientTax').textContent = document.getElementById('recipientTax').value || '-';
-            
+
             document.getElementById('previewNumber').textContent = document.getElementById('invoiceNumber').value || '1';
             document.getElementById('previewDate').textContent = formatDate(document.getElementById('invoiceDate').value);
             document.getElementById('previewDescription').textContent = document.getElementById('invoiceDescription').value || 'Descrizione della prestazione...';
-            
+
+            // Payment Method Fix
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            document.getElementById('previewPaymentMethod').textContent = paymentMethod || '_______________________________';
+
             const gross = parseFloat(document.getElementById('grossAmount').value) || 0;
             const withholding = gross * 0.20;
             const net = gross - withholding;
             const stampDuty = gross > 77.47 ? 2.00 : 0.00;
-            
+
             document.getElementById('previewGross').textContent = formatCurrency(gross);
             document.getElementById('previewWithholding').textContent = formatCurrency(withholding);
             document.getElementById('previewNet').textContent = formatCurrency(net);
-            
+
             const stampNote = document.getElementById('stampNote');
             if (stampDuty > 0) {
                 stampNote.textContent = `Imposta di bollo da ${formatCurrency(stampDuty)} assolta in modo virtuale (art. 15, DPR 642/1972).`;
@@ -209,11 +716,13 @@
             }
         }
 
-        document.getElementById('logoUpload').addEventListener('change', function(e) {
+        // --- Event Listeners ---
+
+        document.getElementById('logoUpload').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     const logo = document.getElementById('previewLogo');
                     logo.src = e.target.result;
                     logo.style.display = 'block';
@@ -223,10 +732,19 @@
         });
 
         document.querySelectorAll('input, textarea').forEach(el => {
-            el.addEventListener('input', updatePreview);
+            if (el.id === 'netAmount') {
+                el.addEventListener('input', () => calculateAmounts('net'));
+            } else if (el.id !== 'grossAmount') { // Gross is updated by Net
+                el.addEventListener('input', () => {
+                    updatePreview();
+                    autoSave();
+                });
+            }
         });
 
-        updatePreview();
+        // Initialize
+        init();
     </script>
 </body>
+
 </html>
